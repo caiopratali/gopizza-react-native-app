@@ -92,14 +92,14 @@ export const Product: React.FC = () => {
         photo_path: reference.fullPath
       });
 
-      Alert.alert('Cadastro', 'Pizza cadastrada com sucesso!')
+      navigation.navigate('Home');
 
     } catch (error) {
+        setIsLoading(false);
+
         Alert.alert('Cadastro', 'Não foi possível cadastrar a pizza.')
 
         console.error(error);
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -124,6 +124,18 @@ export const Product: React.FC = () => {
     }
   }
 
+  const handleDelete = async () => {
+    try {
+      await firestore().collection('pizzas').doc(id).delete();
+
+      await storage().ref(photoPath).delete();
+
+      navigation.navigate('Home');
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     handleGetAllInfoPizza();
   }, [id]);
@@ -135,15 +147,15 @@ export const Product: React.FC = () => {
 
           <Title>Cadastrar</Title>
 
-          <TouchableOpacity>
-            <DeleteLabel>Deletar</DeleteLabel>
+          <TouchableOpacity onPress={handleDelete}>
+            { id && <DeleteLabel>Deletar</DeleteLabel> }
           </TouchableOpacity>
         </Header>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <Upload>
           <Photo uri={image} />
-          <PickImageButton title='Carregar' type='secondary' onPress={handlePickerImage} />
+          { !id && <PickImageButton title='Carregar' type='secondary' onPress={handlePickerImage} /> }
         </Upload>
 
         <Form>
@@ -174,12 +186,15 @@ export const Product: React.FC = () => {
             <InputPrice size='G' onChangeText={setPriceSizeG} value={priceSizeG} />
           </InputGroup>
 
-          <Button 
-            title='Cadastrar Pizza' 
-            type='secondary' 
-            isLoading={isLoading} 
-            onPress={handleAdd}
-          />
+          {
+            !id &&
+            <Button 
+              title='Cadastrar Pizza' 
+              type='secondary' 
+              isLoading={isLoading} 
+              onPress={handleAdd}
+            />
+          }
         </Form>
       </ScrollView>
     </Container>

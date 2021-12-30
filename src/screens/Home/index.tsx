@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from 'styled-components/native';
 import { Alert, FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import happyEmoji from '@assets/happy.png';
 
 import { Search } from '@components/Search';
 import { ProductCard, ProductProps } from '@components/ProductCard';
+import { useAuth } from '@hooks/auth';
 import {
   Container,
   Header,
@@ -27,6 +28,7 @@ export const Home: React.FC = () => {
   const [pizzas, setPizzas] = useState<ProductProps[]>([]);
   const [search, setSearch] = useState('');
 
+  const { signOut, user } = useAuth();
   const theme = useTheme();
   const navigation = useNavigation();
 
@@ -66,25 +68,28 @@ export const Home: React.FC = () => {
   }
 
   const handleOpen = (id: string) => {
-    navigation.navigate('Product', { id });
+    const route = user?.isAdmin ? 'Product' : 'Order';
+    navigation.navigate(route, { id });
   }
 
   const handleAdd = () => {
     navigation.navigate('Product', {});
   }
 
-  useEffect(() => {
-    fetchPizzas('');
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchPizzas('');
+    }, [])
+  );
 
   return (
     <Container>
       <Header>
         <Greeting>
           <GreetingEmoji source={happyEmoji} />
-          <GreetingText>Olá, Admin</GreetingText>
+          <GreetingText>Olá, { user?.name }</GreetingText>
         </Greeting>
-        <SignOut>
+        <SignOut onPress={signOut}>
           <MaterialIcons name='logout' color={theme.COLORS.TITLE} size={24} />
         </SignOut>
       </Header>
@@ -98,7 +103,7 @@ export const Home: React.FC = () => {
 
       <MenuHeader>
         <Title>Cardápio</Title>
-        <MenuItemsNumber>10 pizzas</MenuItemsNumber>
+        <MenuItemsNumber>{pizzas.length} pizzas</MenuItemsNumber>
       </MenuHeader>
 
       <FlatList 
@@ -119,7 +124,10 @@ export const Home: React.FC = () => {
         }}
       />
 
-      <NewProductButton title='Cadastrar Pizza' type='secondary' onPress={handleAdd} />
+      {
+        user?.isAdmin &&
+        <NewProductButton title='Cadastrar Pizza' type='secondary' onPress={handleAdd} />
+      }
     </Container>
   );
 }

@@ -15,7 +15,7 @@ export const Container = styled(TouchableOpacity)<ContainerProps>`
   justify-content: center;
   align-items: center;
 
-  background-color: ${({ theme, type }) => type === 'primary' ? theme.COLORS.SECONDARY_900 : theme.COLORS.PRIMARY_800};
+  background-color: ${({ theme, type }) => type === 'primary' ? theme.COLORS.SUCCESS_900 : theme.COLORS.PRIMARY_800};
 `;
 
 export const Title = styled.Text`
