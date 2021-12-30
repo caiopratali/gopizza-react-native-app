@@ -7,7 +7,7 @@ import {
   Container
 } from './styles';
 
-export const ButtonBack: React.FC = ({ ...rest }: TouchableOpacityProps) => {
+export const ButtonBack: React.FC<TouchableOpacityProps> = ({ ...rest }) => {
   const { COLORS } = useTheme();
 
   return (

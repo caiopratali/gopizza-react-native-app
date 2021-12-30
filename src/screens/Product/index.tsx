@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Platform, TouchableOpacity, ScrollView, Alert } from 'react-native';
 
 import { ButtonBack } from '@components/ButtonBack';
@@ -9,6 +10,8 @@ import { InputPrice } from '@components/InputPrice';
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 import { Photo } from '@components/Photo';
+import { ProductNavigationProps } from '../../@types/navigation';
+import { ProductProps } from '@components/ProductCard';
 
 import {
   Container,
@@ -24,8 +27,18 @@ import {
   MaxCaracters
 } from './styles';
 
+type PizzaResponse = ProductProps & {
+  photo_path: string;
+  prices_sizes: {
+    p: string;
+    m: string;
+    g: string;
+  }
+}
+
 export const Product: React.FC = () => {
 
+  const [photoPath, setPhotoPath] = useState('');
   const [image, setImage] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -33,6 +46,10 @@ export const Product: React.FC = () => {
   const [priceSizeM, setPriceSizeM] = useState('');
   const [priceSizeG, setPriceSizeG] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { id } = route.params as ProductNavigationProps;
 
   const handlePickerImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -86,10 +103,35 @@ export const Product: React.FC = () => {
     }
   }
 
+  const handleGetAllInfoPizza = async () => {
+    if(id) {
+      try {
+        const response = await firestore().collection('pizzas').doc(id).get();
+
+        const product = response.data() as PizzaResponse;
+
+        setName(product.name);
+        setPhotoPath(product.photo_path);
+        setImage(product.photo_url);
+        setDescription(product.description);
+        setPriceSizeP(product.prices_sizes.p);
+        setPriceSizeM(product.prices_sizes.m);
+        setPriceSizeG(product.prices_sizes.g);
+      } catch (error) {
+        Alert.alert('Produto', 'Erro ao carregar as informações do produto.');
+        console.error(error);
+      }
+    }
+  }
+
+  useEffect(() => {
+    handleGetAllInfoPizza();
+  }, [id]);
+
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <Header>
-          <ButtonBack />
+          <ButtonBack onPress={navigation.goBack} />
 
           <Title>Cadastrar</Title>
 
