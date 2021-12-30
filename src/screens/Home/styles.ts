@@ -53,7 +53,7 @@ export const Title = styled.Text`
 
 export const NewProductButton = styled(Button)`
   margin: 0 24px;
-  margin-bottom: ${getBottomSpace() + 12}px;
+  margin-bottom: 8px;
 `;
 
 export const Header = styled(LinearGradient).attrs(({ theme }) => ({

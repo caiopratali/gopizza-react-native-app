@@ -17,7 +17,7 @@ export const UserStackRoutes = () => {
       {
         user?.isAdmin ? (
           <Group>
-            <Screen name="Home" component={Home} />
+            <Screen name="UserTabRoutes" component={UserTabRoutes} />
             <Screen name="Product" component={Product} />
           </Group>
         ) :
