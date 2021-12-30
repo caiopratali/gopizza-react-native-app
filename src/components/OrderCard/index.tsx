@@ -16,7 +16,7 @@ export type OrderProps = {
   pizza: string;
   image: string;
   status: StatusTypesProps;
-  table_number: string;
+  tableNumber: string;
   quantity: string;
 }
 
@@ -31,7 +31,7 @@ export const OrderCard: React.FC<Props> = ({ index, data, ...rest }) => {
       <Image source={{ uri: data.image }} />
 
       <Name>{ data.pizza }</Name>
-      <Description>Mesa { data.table_number } -  Qtd: { data.quantity }</Description>
+      <Description>Mesa { data.tableNumber } - Qtd: { data.quantity }</Description>
 
       <StatusContainer status={data.status}>
         <StatusLabel status={data.status}>{ data.status }</StatusLabel>
